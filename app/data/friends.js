@@ -1,3 +1,4 @@
+// Dummy list of friends as a JSON array
 module.exports = [
     {
         "name": "Gemma",
