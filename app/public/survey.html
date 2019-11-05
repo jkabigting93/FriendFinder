@@ -221,7 +221,7 @@
         console.log(userData);
 
         // GET to API.
-        $.post('/api/new', newUser, function(result) {
+        $.get("/api/new", newUser, function(result) {
           $("#match-name").text(result.name);
           $("#match-photo").attr("src", result.photo);
           $("#results-modal").modal("toggle");     
