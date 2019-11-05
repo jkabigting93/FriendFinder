@@ -33,7 +33,7 @@ module.exports = function(app) {
     });
     
     // POST that takes in survey results + compatibility logic
-    app.post("/api/friends", function(req,res) {
+    app.post("/api/new", function(req,res) {
         var currentUser = req.body;
         var candidateArray = [];
 
