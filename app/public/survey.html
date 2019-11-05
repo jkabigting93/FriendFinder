@@ -4,9 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Friend Finder Assignment</title>
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
-  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-theme.min.css" integrity="sha384-6pzBo3FDv/PJ8r2KRkGHifhEocL+1X2rVCTTkUfGk7/0pbek5mMa1upzvWbrUbOZ" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+  <script src="https://code.jquery.com/jquery.js"></script>
+  <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.5.1/chosen.jquery.min.js"></script>
 </head>
 
 <body>
@@ -163,69 +166,73 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script type="text/javascript">
-    var newUser;
-    
-    $("#submit").on("click", function(e) {
-      e.preventDefault();
-      
-      var userName = $('#name').val().trim();
-      var userImage = $('#photo').val().trim();
-      var userScores = [];
-        
-      $.each($("input[name='q1']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q2']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q3']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q4']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q5']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q6']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q7']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q8']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q9']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      $.each($("input[name='q10']:checked"), function(){
-          var answerValue = $(this).val();
-          userScores.push(answerValue);
-      });
-      
-      newUser = {
-          "name": userName,
-          "photo": userImage,
-          "scores": userScores
-      };
-      var txt = $("input").val();
-      
-      $.post('/api/friends', newUser, function(result) {
-          
-          $("#match-name").text(result.name);
-          $("#match-img").attr("src", result.photo);
-          $("#results-modal").modal("toggle");
-      });
+    // Chosen CSS
+    var config = {
+      ".chosen-select": {},
+      ".chosen-select-deselect": {
+          allow_single_deselect: true
+      },
+      ".chosen-select-no-single": {
+          disable_search_threshold: 10
+      },
+      ".chosen-select-no-results": {
+          no_results_text: "Oops, nothing found!"
+      },
+      ".chosen-select-width": {
+          width: "95%"
+      }
+  };
+
+  for (var selector in config) {
+      $(selector).chosen(config[selector]);
+  }
+
+  $("#submit").on("click", function (event) {
+      event.preventDefault();
+      function validateForm() {
+          var isValid = true;
+          $(".form-control").each(function () {
+              if ($(this).val() === "") {
+                  isValid = false;
+              }
+          });
+
+          $(".chosen-select").each(function () {
+
+              if ($(this).val() === "") {
+                  isValid = false;
+              }
+          });
+          return isValid;
+      }
+
+      // Create an object for the user"s data
+      if (validateForm()) {
+          var userData = {
+              name: $("#name").val(),
+              photo: $("#photo").val(),
+              scores: [
+                  $("#q1").val(),
+                  $("#q2").val(),
+                  $("#q3").val(),
+                  $("#q4").val(),
+                  $("#q5").val(),
+                  $("#q6").val(),
+                  $("#q7").val(),
+                  $("#q8").val(),
+                  $("#q9").val(),
+                  $("#q10").val()
+              ]
+          };
+          $.post("/api/friends", userData, function (data) {
+              $("#match-name").text(data.name);
+              $("#match-img").attr("src", data.photo);
+              $("#results-modal").modal("toggle");
+          });
+
+      } else {
+          alert("You have not filled in all fields!");
+      }
     });
   </script>
 </body>
