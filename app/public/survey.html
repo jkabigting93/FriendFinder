@@ -163,72 +163,69 @@
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
   <script type="text/javascript">
-    // Chosen CSS
-    var config = {
-      ".chosen-select": {},
-      ".chosen-select-deselect": {
-        allow_single_deselect: true
-      },
-      ".chosen-select-no-single": {
-        disable_search_threshold: 10
-      },
-      ".chosen-select-no-results": {
-        no_results_text: "Oops, nothing found!"
-      },
-      ".chosen-select-width": {
-        width: "95%"
-      }
-    };
-    for (var selector in config) {
-      $(selector).chosen(config[selector]);
-    }
-
-    $("#submit").on("click", function(event) {
-      event.preventDefault();
-      function validateForm() {
-        var isValid = true;
-        $(".form-control").each(function() {
-          if ($(this).val() === "") {
-            isValid = false;
-          }
-        });
-        $(".chosen-select").each(function() {
-          if ($(this).val() === "") {
-            isValid = false;
-          }
-        });
-        return isValid;
-      }
-
-      // Create user object if all required fields are filled
-      if (validateForm()) {
-        var userData = {
-          name: $("#name").val(),
-          photo: $("#photo").val(),
-          scores: [
-            $("#q1").val(),
-            $("#q2").val(),
-            $("#q3").val(),
-            $("#q4").val(),
-            $("#q5").val(),
-            $("#q6").val(),
-            $("#q7").val(),
-            $("#q8").val(),
-            $("#q9").val(),
-            $("#q10").val()
-          ]
-        };
-        console.log(userData);
-
-        // GET to API.
-        $.get("/api/new", newUser, function(result) {
+    var newUser;
+    
+    $("#submit").on("click", function(e) {
+      e.preventDefault();
+      
+      var userName = $('#name').val().trim();
+      var userImage = $('#photo').val().trim();
+      var userScores = [];
+        
+      $.each($("input[name='q1']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q2']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q3']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q4']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q5']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q6']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q7']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q8']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q9']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      $.each($("input[name='q10']:checked"), function(){
+          var answerValue = $(this).val();
+          userScores.push(answerValue);
+      });
+      
+      newUser = {
+          "name": userName,
+          "photo": userImage,
+          "scores": userScores
+      };
+      var txt = $("input").val();
+      
+      $.post('/api/new', newUser, function(result) {
+          
           $("#match-name").text(result.name);
-          $("#match-photo").attr("src", result.photo);
-          $("#results-modal").modal("toggle");     
-        });
-      } else {
-        alert("PLEASE NOTE: A required field is empty!");
-      }
+          $("#match-img").attr("src", result.photo);
+          $("#results-modal").modal("toggle");
+      });
     });
   </script>
 </body>
