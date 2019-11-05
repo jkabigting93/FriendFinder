@@ -1,30 +1,5 @@
 var friends = require("../data/friends");
 
-// Logic using arrays to compare user scores
-calcTotalDifference = function(user, candidate) {
-    var totalDiff = 0;
-    var userScores = user.scores.map(function(x) {
-        return parseInt(x, 10);
-    });
-    console.log("userScores: ", userScores.join(" "));
-
-    var candidateScores = candidate.scores.map(function (x) {
-        return parseInt(x, 10);
-    });
-    console.log("candidateScores: ", candidateScores.join(" "));
-
-    for (var i = 0; i < userScores.length; i++) {
-        totalDiff += Math.abs(userScores[i] - candidateScores[i]);
-    }
-    console.log("totalDiff: ", totalDiff);
-
-    return {
-        name: candidate.name,
-        photo: candidate.photo,
-        totalDiff: totalDiff
-    };
-}
-
 module.exports = function(app) {
 
     // GET to display JSON of all possible friends
@@ -33,33 +8,33 @@ module.exports = function(app) {
     });
     
     // POST that takes in survey results + compatibility logic
-    app.post("/api/new", function(req,res) {
-        var currentUser = req.body;
-        var candidateArray = [];
+    app.post("/api/friends", function(req,res) {
+        var bestMatch = {
+            name: "",
+            photo: "",
+            friendDifference: 1000
+        };
+        var userData = req.body;
+        var userScores = userData.scores;
+        var userName = userData.name;
+        var userPhoto = userData.photo;
+        var totalDifference = 0;
 
-        console.log("Current User: " + currentUser);
-        for(var i = 0; i < friends.length; i++) {
-            candidateArray.push(calcTotalDifference(currentUser, friends[i]));
-        }
-        
-        candidateArray.sort(function(x, y) {
-            var diff1 = x.totalDiff;
-            var diff2 = y.totalDiff;
-            if (diff1 < diff2) {
-                return -1;
-            } else if (diff1 > diff2) {
-                return 1;
+        // loop through all friends for scores
+        for (var i = 0; i < friends.length - 1; i++) {
+            console.log(friends[i].name);
+            totalDifference = 0;
+            // 2nd loop to compare all other user's scores with current user
+            for (var j = 0; j < 10; j++) {
+                totalDifference += Math.abs(parseInt(userScores[j]) - parseInt(friends[i].scores[j]));
+                if (totalDifference <= bestMatch.friendDifference) {
+                    bestMatch.name = friends[i].name;
+                    bestMatch.photo = friends[i].photo;
+                    bestMatch.friendDifference = totalDifference;
+                }
             }
-            return 0;
-        });
-
-        for (var i = 0; i < candidateArray.length; i++) {
-            console.log(candidateArray[i].name, candidateArray[i].photo, candidateArray[i].totalDiff);
         }
-        friends.push(currentUser);
-
-        console.log("Congratulations! Your most compatible match is " + candidateArray[0].name, + candidateArray[0].photo, candidateArray[0].totalDiff);
-
-        res.json(candidateArray[0]);
+        friends.push(userData);
+        res.json(bestMatch);
     });
 };
