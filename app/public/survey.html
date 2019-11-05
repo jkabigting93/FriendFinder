@@ -220,7 +220,7 @@
       };
       var txt = $("input").val();
       
-      $.post('/api/new', newUser, function(result) {
+      $.post('/api/friends', newUser, function(result) {
           
           $("#match-name").text(result.name);
           $("#match-img").attr("src", result.photo);

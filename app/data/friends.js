@@ -1,5 +1,5 @@
 // Dummy list of friends as a JSON array
-module.exports = [
+var friends = [
     {
         "name": "Gemma",
         "photo": "https://images.unsplash.com/photo-1570500091894-635e2730c151?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=500&q=60",
@@ -81,3 +81,5 @@ module.exports = [
         "scores": [2, 2, 2, 2, 2, 1, 3, 3, 4, 4]
     }
 ];
+
+module.exports = friends;
