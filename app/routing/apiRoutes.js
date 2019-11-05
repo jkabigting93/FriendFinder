@@ -10,34 +10,32 @@ module.exports = function(app) {
     // POST that takes in survey results + compatibility logic
     app.post("/api/new", function(req,res) {
         var currentUser = req.body;
-        var scoreDifference;
-        var friendScore;
-        var userScore;
-        var bestMatch = {
-            name: "",
-            photo: "",
-            friendDiff: Infinity
-        };
+        var candidateArray = [];
 
         console.log("Current User: " + currentUser);
-
         for(var i = 0; i < friends.length; i++) {
-            var currentFriend = friends[i];
-            scoreDifference = 0;
+            candidateArray.push(calcTotalDifference(currentUser, friends[i]));
+        }
         
-            for (var j = 0; j < currentUser.scores.length; j++) {
-                friendScore = currentFriend.scores[j];
-                userScore = currentUser.scores[j];
-                scoreDifference  += Math.abs(parseInt(userScore) - parseInt(friendScore));
-            } 
-
-            if (scoreDifference <= bestMatch.friendDiff){
-                bestMatch.name = currentFriend.name;
-                bestMatch.photo = currentFriend.photo;
-                bestMatch.friendDiff = scoreDifference ;
+        candidateArray.sort(function(x, y) {
+            var diff1 = x.totalDiff;
+            var diff2 = y.totalDiff;
+            if (diff1 < diff2) {
+                return -1;
+            } else if (diff1 > diff2) {
+                return 1;
             }
-        } 
-        res.json(bestMatch);
+            return 0;
+        });
+
+        for (var i = 0; i < candidateArray.length; i++) {
+            console.log(candidateArray[i].name, candidateArray[i].photo, candidateArray[i].totalDiff);
+        }
+        friends.push(currentUser);
+
+        console.log("Congratulations! Your most compatible match is " + candidateArray[0].name, + candidateArray[0].photo, candidateArray[0].totalDiff);
+
+        res.json(candidateArray[0]);
     });
 };
 
