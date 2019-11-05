@@ -19,6 +19,8 @@ module.exports = function(app) {
             friendDiff: Infinity
         };
 
+        console.log("Current User: " + currentUser);
+
         for(var i = 0; i < friends.length; i++) {
             var currentFriend = friends[i];
             scoreDifference = 0;
@@ -38,3 +40,28 @@ module.exports = function(app) {
         res.json(bestMatch);
     });
 };
+
+// Logic using arrays to compare user scores
+calcTotalDifference = function(user, candidate) {
+    var totalDiff = 0;
+    var userScores = user.scores.map(function(x) {
+        return parseInt(x, 10);
+    });
+    console.log("userScores: ", userScores.join(" "));
+
+    var candidateScores = candidate.scores.map(function (x) {
+        return parseInt(x, 10);
+    });
+    console.log("candidateScores: ", candidateScores.join(" "));
+
+    for (var i = 0; i < userScores.length; i++) {
+        totalDiff += Math.abs(userScores[i] - candidateScores[i]);
+    }
+    console.log("totalDiff: ", totalDiff);
+
+    return {
+        name: candidate.name,
+        photo: candidate.photo,
+        totalDiff: totalDiff
+    };
+}
