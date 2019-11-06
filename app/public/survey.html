@@ -4,11 +4,17 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
   <title>Friend Finder Assignment</title>
-
   <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.6.1/css/font-awesome.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.css" integrity="sha256-0LjJurLJoa1jcHaRwMDnX2EQ8VpgpUMFT/4i+TEtLyc=" crossorigin="anonymous" />
 </head>
+
+<style>
+  img {
+     height: 50%;
+     width: 50%;
+  }
+</style>
 
 <body>
   <div class="container">
@@ -150,7 +156,7 @@
         </div>
         <div class="modal-body">
           <h2 id="match-name"></h2>
-          <img id="match-img" src="https://scontent.fybz2-1.fna.fbcdn.net/v/t1.0-9/46792882_10212712256350045_74152812228902912_n.jpg?_nc_cat=108&_nc_oc=AQn8b3dd-DntN66zkdjMvlPF2GMCINr-35pHtVxlgn4fgBGtzK9h_QuseTn8ZDcgszc&_nc_ht=scontent.fybz2-1.fna&oh=9808356217abf55be66d682da48a113f&oe=5E1A8F51" alt="">
+          <img id="match-img" src="" alt="">
         </div>
         <div class="modal-footer">
           <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
@@ -160,13 +166,12 @@
   </div>
 
   <script src="https://code.jquery.com/jquery-3.4.1.js" integrity="sha256-WpOohJOqMqqyKL9FccASB9O0KwACQJpFTUBLTYOVvVU=" crossorigin="anonymous"></script>
-  <!-- <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script> -->
-  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.4.1/core.js" integrity="sha256-36hEPcG8mKookfvUVvEqRkpdYV1unP6wvxIqbgdeVhk=" crossorigin="anonymous"></script> -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
   <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/chosen/1.8.7/chosen.jquery.js" integrity="sha256-TDtzz+WOGufaQuQzqpEnnxdJQW5xrU+pzjznwBtaWs4=" crossorigin="anonymous"></script>
 
   <script type="text/javascript">
+
     // Chosen CSS
     var config = {
       ".chosen-select": {},
@@ -192,7 +197,7 @@
       event.preventDefault();
       function validateForm() {
           var isValid = true;
-          $(".form-control").each(function () {
+          $(".form-control").each(function() {
               if ($(this).val() === "") {
                   isValid = false;
               }
@@ -208,7 +213,7 @@
 
       // Create an object for the user"s data
       if (validateForm()) {
-          var userData = {
+          var friendData = {
               name: $("#name").val(),
               photo: $("#photo").val(),
               scores: [
@@ -224,11 +229,32 @@
                   $("#q10").val()
               ]
           };
-          console.log(userData);
-          $.get("/api/friends", userData, function(data) {
-              $("#match-name").text(data.name);
-              $("#match-img").attr("src", data.photo);
-              $("#results-modal").modal("toggle");
+          var currentURL = window.location.origin;
+          $.post(currentURL + "/api/friends", friendData, function(data) {});
+          $.ajax({
+            url: currentURL + "/api/friends",
+            method: "GET"
+          }).done(function(res) {
+            var bestFriend;
+            var currentBest = 100;
+            var differenceArray = [];
+            for (i = 0; i < res.length - 1; i++) {
+              for (j = 0; j < 10; j++) {
+                var currentDifference = friendData.scores[j] - res[i].scores[j];
+                differenceArray.push(Math.abs(currentDifference));
+              }
+              var difference = differenceArray.reduce(add, 0);
+              if (difference < currentBest) {
+                bestFriend = res[i];
+                currentBest = difference;
+                differenceArray = [];
+              } else {
+                differenceArray = [];
+              }
+            }
+              $("#match-name").text(friendData.name);
+              $("#match-img").attr("src", friendData.photo);
+              $("#results-modal").modal("show");
           });
       } else {
           alert("You have not filled in all fields!");
