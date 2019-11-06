@@ -246,17 +246,18 @@
               var friends = req;
 
               // Loop through array to compare user scores
-              for (i = 0; i < friends.length; i++) {
+              for (var i = 0; i < friends.length; i++) {
                 if (friendData.name !== friends[i].name) {
                   currentScore = 0;
-                  for (var j = 0; j < friends[i].score.length; j++) {
-                    currentScore += Math.abs(friendData.score[j] - friends[i].score[j]);
+                  for (var j = 0; j < friends[j].scores.length; j++) {
+                    currentScore += Math.abs(friendData.scores[j] - friends[i].scores[j]);
                   }
                   if (currentScore < bestScore) {
                     bestScore = currentScore;
                     match = friends[i];
                   }
                 }
+                console.log(currentScore);
               }
 
               // Send info to modal popup
@@ -264,10 +265,12 @@
               $("#match-img").attr("src", match.photo);
               $("#results-modal").modal("toggle");
             }
+              getMatch(friendData, req);
           });
       } else {
           alert("You have not filled in all fields!");
       }
+      return false;
     });
   </script>
 </body>
