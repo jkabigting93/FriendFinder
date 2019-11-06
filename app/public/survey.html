@@ -229,41 +229,46 @@
                   $("#q10").val()
               ]
           };
-          var currentURL = window.location.origin;
-          $.post(currentURL + "/api/friends", friendData, function(data) {});
-          $.ajax({
-            url: currentURL + "/api/friends",
-            method: "GET"
-          }).done(function(res) {
-            var bestFriend;
-            var currentBest = 100;
-            var differenceArray = [];
-            for (i = 0; i < res.length - 1; i++) {
-              for (j = 0; j < 10; j++) {
-                var currentDifference = friendData.scores[j] - res[i].scores[j];
-                differenceArray.push(Math.abs(currentDifference));
+          console.log(friendData);
+
+          // POST request to send form input as req data and start logic to compare arrays
+          $.post("/api/friends", friendData)
+            .done(function(data) {
+          });
+
+          // GET request to to grab friend array with new user score array added 
+          $.get("/api/friends", function(req, res) {
+            function getMatch(friendData, req) {
+              var bestScore = 100;
+              var currentScoreArray = [];
+              var currentScore = 0;
+              var match;
+              var friends = req;
+
+              // Loop through array to compare user scores
+              for (i = 0; i < friends.length; i++) {
+                if (friendData.name !== friends[i].name) {
+                  currentScore = 0;
+                  for (var j = 0; j < friends[i].score.length; j++) {
+                    currentScore += Math.abs(friendData.score[j] - friends[i].score[j]);
+                  }
+                  if (currentScore < bestScore) {
+                    bestScore = currentScore;
+                    match = friends[i];
+                  }
+                }
               }
-              var difference = differenceArray.reduce(add, 0);
-              if (difference < currentBest) {
-                bestFriend = res[i];
-                currentBest = difference;
-                differenceArray = [];
-              } else {
-                differenceArray = [];
-              }
+
+              // Send info to modal popup
+              $("#match-name").text(match.name);
+              $("#match-img").attr("src", match.photo);
+              $("#results-modal").modal("toggle");
             }
-              $("#match-name").text(friendData.name);
-              $("#match-img").attr("src", friendData.photo);
-              $("#results-modal").modal("show");
           });
       } else {
           alert("You have not filled in all fields!");
       }
     });
-
-    function add(a, b){
-	    return a+b;
-    };
   </script>
 </body>
 </html>
