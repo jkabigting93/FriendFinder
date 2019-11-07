@@ -255,15 +255,14 @@
                   if (currentScore < bestScore) {
                     bestScore = currentScore;
                     match = friends[i];
+
+                    // Send info to modal popup
+                    $("#match-name").text(match.name);
+                    $("#match-img").attr("src", match.photo);
+                    $("#results-modal").modal("toggle");
                   }
                 }
-                console.log(currentScore);
               }
-
-              // Send info to modal popup
-              $("#match-name").text(match.name);
-              $("#match-img").attr("src", match.photo);
-              $("#results-modal").modal("toggle");
             }
               getMatch(friendData, req);
           });
